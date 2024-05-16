@@ -50,14 +50,20 @@ class FCFS(Scheduler):
         self.processes.sort(key=lambda x: x["arrival_time"])
         
         for i, process in enumerate(self.processes):
-            if i > 0:
+            if i == 0:
+                self.waiting_times[i] = 0
+                start_time = process["arrival_time"]
+                self.current_time = start_time
+            else:
                 self.waiting_times[i] = max(self.current_time - process["arrival_time"], 0)
+                start_time = self.current_time
                 
-            start_time = self.current_time
+            self.current_time = max(self.current_time, process["arrival_time"])
             self.current_time += process["burst_time"]
             self.completion_times[i] = self.current_time
-            self.turnaround_times[i] = self.current_time - process["arrival_time"]
+            self.turnaround_times[i] = self.completion_times[i] - process["arrival_time"]
             self.gantt_chart.append((start_time, self.current_time, process['process_id'], colormap(i / self.num_processes)))
+
             
 class Priority(Scheduler):
     def run(self):
