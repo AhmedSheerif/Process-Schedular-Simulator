@@ -44,27 +44,27 @@ class Scheduler:
     def finish_plot(self, ax):
         ax.set_xticks(np.arange(0, max(self.completion_times, default=0) + 1, 1))
         ax.grid(True, which='both', axis='x', color='gray', linestyle='-', linewidth=0.5, alpha=0.5)
-
+            
 class FCFS(Scheduler):
     def run(self):
         self.processes.sort(key=lambda x: x["arrival_time"])
-        
+
         for i, process in enumerate(self.processes):
             if i == 0:
                 self.waiting_times[i] = 0
-                start_time = process["arrival_time"]
-                self.current_time = start_time
+                self.current_time = process["arrival_time"]
             else:
-                self.waiting_times[i] = max(self.current_time - process["arrival_time"], 0)
-                start_time = self.current_time
-                
-            self.current_time = max(self.current_time, process["arrival_time"])
+                if self.current_time < process["arrival_time"]:
+                    self.current_time = process["arrival_time"]
+
+                self.waiting_times[i] = self.current_time - process["arrival_time"]
+
+            start_time = self.current_time
             self.current_time += process["burst_time"]
             self.completion_times[i] = self.current_time
             self.turnaround_times[i] = self.completion_times[i] - process["arrival_time"]
             self.gantt_chart.append((start_time, self.current_time, process['process_id'], colormap(i / self.num_processes)))
 
-            
 class Priority(Scheduler):
     def run(self):
         self.processes.sort(key=lambda x: (x["priority"], x["arrival_time"]))
