@@ -88,7 +88,6 @@ class Priority(Scheduler):
             self.gantt_chart.append((start_time, self.current_time, self.processes[next_process]['process_id'], colormap(next_process / self.num_processes)))
                     
 class Priority_pre(Scheduler):
-    
     def run(self):
         self.processes.sort(key=lambda x: (x["priority"], x["arrival_time"]))
         remaining_burst_times = {i: proc["burst_time"] for i, proc in enumerate(self.processes)}
